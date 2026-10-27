@@ -1,0 +1,739 @@
+:root {
+  /* Surfaces */
+  --bg: #F4F6F8;
+  --surface: #FFFFFF;
+  --surface-2: #F8FAFB;
+  --surface-3: #EEF2F6;
+
+  /* Lines */
+  --border: #E4E8EE;
+  --border-strong: #CFD6E0;
+
+  /* Ink */
+  --text-1: #1B2430;
+  --text-2: #55606E;
+  --text-3: #96A0AF;
+
+  /* Accent — steel blue, used sparingly */
+  --accent: #2F5FA8;
+  --accent-hover: #28518F;
+  --accent-soft: #EDF2F9;
+  --accent-ring: rgba(47, 95, 168, 0.14);
+
+  /* Status */
+  --success: #2F8A5D;
+
+  /* Conversation */
+  --user-bubble: #202B3D;
+
+  /* Shape & elevation */
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow-xs: 0 1px 2px rgba(18, 26, 38, 0.05);
+  --shadow-sm: 0 1px 2px rgba(18, 26, 38, 0.04), 0 2px 6px rgba(18, 26, 38, 0.05);
+  --shadow-lg: 0 16px 40px -12px rgba(18, 26, 38, 0.22);
+
+  /* Typography */
+  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+
+/* ==========================================================================
+   02. RESET & BASE
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* App-shell model: the page itself never scrolls,
+   inner regions (chat stream, trace list) own the scrolling. */
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.55;
+  background: var(--bg);
+  color: var(--text-1);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(47, 95, 168, 0.16);
+}
+
+
+/* ==========================================================================
+   03. APP SHELL
+   ========================================================================== */
+
+/* Lock the shell to the viewport height.
+   minmax(0, 1fr) on the row keeps grid items bounded so
+   children can shrink and scroll instead of stretching the page. */
+.shell {
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr) 330px;
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--bg);
+}
+
+
+/* ==========================================================================
+   04. SIDEBAR
+   ========================================================================== */
+
+.sidebar,
+.trace-panel {
+  background: var(--surface);
+  padding: 28px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-height: 0;
+}
+
+.sidebar {
+  justify-content: space-between;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+/* Brand block — quiet tag instead of a colored pill */
+.brand-badge {
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.sidebar h1 {
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  margin: 14px 0 8px;
+  color: var(--text-1);
+}
+
+.muted {
+  color: var(--text-2);
+  line-height: 1.6;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Workflow card — numbered steps with a shared counter */
+.workflow-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  counter-reset: step;
+}
+
+.workflow-card h3 {
+  margin: 0 0 12px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  font-weight: 600;
+}
+
+.flow-step {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-1);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  counter-increment: step;
+}
+
+.flow-step::before {
+  content: counter(step, decimal-leading-zero);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.flow-step:last-child {
+  margin-bottom: 0;
+}
+
+.secondary-btn {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-1);
+  border-radius: var(--radius);
+  padding: 11px 16px;
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.secondary-btn:hover {
+  background: var(--surface-2);
+  border-color: var(--text-3);
+}
+
+
+/* ==========================================================================
+   05. TOPBAR
+   ========================================================================== */
+
+.topbar {
+  height: 64px;
+  flex: 0 0 auto;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--success);
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+  box-shadow: 0 0 0 3px rgba(47, 138, 93, 0.15);
+}
+
+.pill {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* ==========================================================================
+   06. CHAT STREAM
+   ========================================================================== */
+
+/* Centered column keeps line lengths readable on wide screens.
+   flex: 1 + min-height: 0 lets it shrink to the remaining space
+   and scroll internally; topbar and composer stay pinned. */
+.chat-area {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 36px 40px 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.message {
+  display: flex;
+  gap: 12px;
+  max-width: min(85%, 680px);
+}
+
+.message.assistant {
+  align-self: flex-start;
+}
+
+.message.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #FFFFFF;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+/* Flat bordered bubbles — no speech tails, no glow */
+.bubble {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  font-size: 14.5px;
+  line-height: 1.65;
+}
+
+.message.user .bubble {
+  background: var(--user-bubble);
+  border-color: var(--user-bubble);
+  color: #F4F6F8;
+}
+
+.bubble strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 650;
+  margin-bottom: 5px;
+  color: var(--text-1);
+}
+
+.message.user .bubble strong {
+  color: #FFFFFF;
+}
+
+.bubble p {
+  margin: 0;
+}
+
+.answer-source {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.citations {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.citations a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.citations a:hover {
+  text-decoration: underline;
+}
+
+
+/* ==========================================================================
+   07. COMPOSER
+   ========================================================================== */
+
+.composer-wrap {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 8px 40px 28px;
+}
+
+.examples {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.example {
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.example:hover {
+  background: var(--surface);
+  color: var(--text-1);
+  border-color: var(--text-3);
+}
+
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 10px 8px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.composer:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+.composer textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-1);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 8px;
+  resize: none;
+  caret-color: var(--accent);
+}
+
+.send-btn {
+  border: none;
+  background: var(--accent);
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 13.5px;
+  border-radius: var(--radius);
+  padding: 11px 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.send-btn:hover {
+  background: var(--accent-hover);
+}
+
+.send-btn:disabled {
+  cursor: not-allowed;
+  background: var(--surface-3);
+  color: var(--text-3);
+}
+
+
+/* ==========================================================================
+   08. TRACE PANEL
+   ========================================================================== */
+
+.trace-panel {
+  border-left: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.trace-panel h2 {
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--text-1);
+  margin: 0;
+}
+
+/* min-height: 0 lets the list actually scroll inside the flex column */
+.trace-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 6px 0;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.trace-item {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  line-height: 1.5;
+}
+
+.empty {
+  color: var(--text-3);
+  font-size: 13.5px;
+  text-align: center;
+  padding: 48px 0;
+}
+
+.source-box {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.source-box span {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.source-box strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+
+/* ==========================================================================
+   09. MODAL
+   ========================================================================== */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 22, 32, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  z-index: 100;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.modal-card {
+  width: min(440px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-head h2 {
+  font-size: 17px;
+  font-weight: 650;
+  color: var(--text-1);
+  margin: 0;
+}
+
+.modal-head button {
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  font-size: 18px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius);
+  display: grid;
+  place-items: center;
+}
+
+.modal-head button:hover {
+  background: var(--surface-3);
+  color: var(--text-1);
+}
+
+.modal-card input[type="password"] {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 14px;
+  color: var(--text-1);
+  outline: none;
+}
+
+.modal-card input[type="password"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+.modal-card input[type="file"] {
+  font-size: 13.5px;
+  color: var(--text-2);
+}
+
+.modal-card input[type="file"]::file-selector-button {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  margin-right: 12px;
+  color: var(--text-1);
+}
+
+.modal-card input[type="file"]::file-selector-button:hover {
+  background: var(--surface-3);
+}
+
+.full {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.upload-status {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--success);
+}
+
+
+/* ==========================================================================
+   10. UTILITIES & SCROLLBARS
+   ========================================================================== */
+
+.chat-area,
+.trace-list {
+  scrollbar-width: thin;
+  scrollbar-color: #C9D1DC transparent;
+}
+
+.chat-area::-webkit-scrollbar,
+.trace-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-area::-webkit-scrollbar-thumb,
+.trace-list::-webkit-scrollbar-thumb {
+  background: #C9D1DC;
+  border-radius: 8px;
+}
+
+.chat-area::-webkit-scrollbar-track,
+.trace-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+/* ==========================================================================
+   11. RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 1150px) {
+  .shell {
+    grid-template-columns: 250px minmax(0, 1fr);
+  }
+
+  .trace-panel {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  /* Keep the bounded app shell on mobile — single full-height column */
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .topbar {
+    padding: 0 20px;
+  }
+
+  .pill {
+    display: none;
+  }
+
+  .chat-area {
+    padding: 24px 16px 8px;
+  }
+
+  .composer-wrap {
+    padding: 8px 16px 20px;
+  }
+
+  .message {
+    max-width: 92%;
+  }
+}
+
+
+/* ==========================================================================
+   12. MOTION & ACCESSIBILITY
+   ========================================================================== */
+
+/* Scoped transitions on interactive elements only — never a global "*" rule */
+.secondary-btn,
+.send-btn,
+.example,
+.flow-step,
+.modal-head button,
+.modal-card input[type="password"],
+.modal-card input[type="file"]::file-selector-button {
+  transition: background-color 0.15s ease,
+              border-color 0.15s ease,
+              color 0.15s ease,
+              box-shadow 0.15s ease;
+}
+
+button:focus-visible,
+a:focus-visible,
+.example:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
+}
